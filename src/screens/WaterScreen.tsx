@@ -1,15 +1,16 @@
 // src/screens/WaterScreen.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Animated, Dimensions, Vibration,
+  Dimensions, Vibration,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAppStore } from '../store/useAppStore';
 import { Card } from '../components/ui/Card';
 import { ProgressBar } from '../components/ui/ProgressBar';
-import { COLORS, FONT, SPACING, RADIUS } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { FONT, SPACING, RADIUS } from '../constants/theme';
 
 const { width: W } = Dimensions.get('window');
 
@@ -21,21 +22,27 @@ const QUICK_AMOUNTS = [
 ];
 
 const MESSAGES = [
-  { min: 0, max: 25, msg: "Time to start hydrating! 💧", color: COLORS.red },
-  { min: 25, max: 50, msg: "Good start! Keep going ⚡", color: COLORS.orange },
-  { min: 50, max: 75, msg: "Halfway there! 👍", color: COLORS.orange },
-  { min: 75, max: 100, msg: "Almost at goal! 💪", color: COLORS.green },
-  { min: 100, max: 999, msg: "Goal reached! Amazing! 🎉", color: COLORS.primary },
+  { min: 0,   max: 25,  msg: "Time to start hydrating! 💧", colorKey: 'red' },
+  { min: 25,  max: 50,  msg: "Good start! Keep going ⚡",   colorKey: 'orange' },
+  { min: 50,  max: 75,  msg: "Halfway there! 👍",           colorKey: 'orange' },
+  { min: 75,  max: 100, msg: "Almost at goal! 💪",          colorKey: 'green' },
+  { min: 100, max: 999, msg: "Goal reached! Amazing! 🎉",   colorKey: 'primary' },
 ];
 
 export default function WaterScreen() {
-  const { waterTotal, waterGoal, waterLogs, weeklyWater, addWater } = useAppStore();
+  const { colors, isDark } = useTheme();
+  const { waterTotal, waterGoal, waterLogs, weeklyWater, addWater, fetchWaterLogs } = useAppStore();
   const [adding, setAdding] = useState(false);
+
+  const today = new Date().toISOString().split('T')[0];
+  useEffect(() => { fetchWaterLogs(today); }, []);
+
   const pct = Math.min((waterTotal / waterGoal) * 100, 100);
   const drops = Math.round((waterTotal / waterGoal) * 8);
   const remaining = Math.max(waterGoal - waterTotal, 0);
 
   const msgConfig = MESSAGES.find(m => pct >= m.min && pct < m.max) || MESSAGES[MESSAGES.length - 1];
+  const msgColor = (colors as any)[msgConfig.colorKey];
 
   const handleAdd = (amount: number) => {
     setAdding(true);
@@ -44,31 +51,30 @@ export default function WaterScreen() {
     setTimeout(() => setAdding(false), 300);
   };
 
-  // Weekly avg
-  const weeklyAvg = weeklyWater.reduce((s, d) => s + d.amount, 0) / weeklyWater.length;
+  const weeklyAvg = weeklyWater.length > 0 ? weeklyWater.reduce((s, d) => s + (d as any).amount, 0) / weeklyWater.length : 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Hydration 💧</Text>
-          <Text style={styles.subtitle}>Stay hydrated throughout the day</Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Hydration 💧</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>Stay hydrated throughout the day</Text>
         </View>
 
         {/* Main Card */}
-        <Card style={styles.mainCard} elevated>
-          <LinearGradient colors={['#0C1A3A', '#0A0A0F'] as [string,string]} style={StyleSheet.absoluteFill} />
+        <Card style={[styles.mainCard, { borderColor: `${colors.blue}30` }]} elevated>
+          <LinearGradient colors={isDark ? ['#0C1A3A','#0A0A0F'] as [string,string] : ['#EFF6FF','#F8FAFC'] as [string,string]} style={StyleSheet.absoluteFill} />
 
           {/* Bottle SVG-like visualization */}
           <View style={styles.bottleContainer}>
             {/* Outer bottle */}
-            <View style={styles.bottle}>
+            <View style={[styles.bottle, { borderColor: `${colors.blue}40`, backgroundColor: `${colors.blue}10` }]}>
               {/* Fill layer */}
               <View style={[styles.bottleFill, { height: `${pct}%` }]}>
                 <LinearGradient
-                  colors={pct >= 75 ? [COLORS.blue, '#60A5FA'] as [string,string] : pct >= 50 ? [COLORS.blue, '#93C5FD'] as [string,string] : ['#1D4ED8', COLORS.blue] as [string,string]}
+                  colors={pct >= 75 ? [colors.blue, '#60A5FA'] as [string,string] : pct >= 50 ? [colors.blue, '#93C5FD'] as [string,string] : ['#1D4ED8', colors.blue] as [string,string]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 1 }} end={{ x: 1, y: 0 }}
                 />
@@ -84,29 +90,29 @@ export default function WaterScreen() {
             {/* Stats beside bottle */}
             <View style={styles.bottleStats}>
               <View style={styles.bottleStat}>
-                <Text style={styles.bottleStatVal}>{waterTotal.toFixed(1)}</Text>
-                <Text style={styles.bottleStatUnit}>L today</Text>
+                <Text style={[styles.bottleStatVal, { color: colors.textPrimary }]}>{waterTotal.toFixed(1)}</Text>
+                <Text style={[styles.bottleStatUnit, { color: colors.textMuted }]}>L today</Text>
               </View>
-              <View style={styles.bottleStatDivider} />
+              <View style={[styles.bottleStatDivider, { backgroundColor: colors.border }]} />
               <View style={styles.bottleStat}>
-                <Text style={[styles.bottleStatVal, { color: COLORS.blue }]}>{waterGoal}</Text>
-                <Text style={styles.bottleStatUnit}>L goal</Text>
+                <Text style={[styles.bottleStatVal, { color: colors.blue }]}>{waterGoal}</Text>
+                <Text style={[styles.bottleStatUnit, { color: colors.textMuted }]}>L goal</Text>
               </View>
-              <View style={styles.bottleStatDivider} />
+              <View style={[styles.bottleStatDivider, { backgroundColor: colors.border }]} />
               <View style={styles.bottleStat}>
-                <Text style={[styles.bottleStatVal, { color: COLORS.orange }]}>{remaining.toFixed(1)}</Text>
-                <Text style={styles.bottleStatUnit}>L left</Text>
+                <Text style={[styles.bottleStatVal, { color: colors.orange }]}>{remaining.toFixed(1)}</Text>
+                <Text style={[styles.bottleStatUnit, { color: colors.textMuted }]}>L left</Text>
               </View>
             </View>
           </View>
 
           {/* Message */}
-          <Text style={[styles.message, { color: msgConfig.color }]}>{msgConfig.msg}</Text>
+          <Text style={[styles.message, { color: msgColor }]}>{msgConfig.msg}</Text>
 
           {/* Drop indicators */}
           <View style={styles.dropsRow}>
             {Array.from({ length: 8 }, (_, i) => (
-              <View key={i} style={[styles.drop, i < drops && { backgroundColor: COLORS.blue }]}>
+              <View key={i} style={[styles.drop, { backgroundColor: colors.surface }, i < drops && { backgroundColor: colors.blue }]}>
                 <Text style={styles.dropEmoji}>{i < drops ? '💧' : '○'}</Text>
               </View>
             ))}
@@ -115,28 +121,28 @@ export default function WaterScreen() {
 
         {/* Quick Add Buttons */}
         <View style={styles.quickSection}>
-          <Text style={styles.sectionTitle}>Quick Add</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Quick Add</Text>
           <View style={styles.quickGrid}>
             {QUICK_AMOUNTS.map(({ label, amount, emoji, desc }) => (
               <TouchableOpacity
                 key={label}
-                style={[styles.quickBtn, adding && { opacity: 0.7 }]}
+                style={[styles.quickBtn, { borderColor: `${colors.blue}30` }, adding && { opacity: 0.7 }]}
                 onPress={() => handleAdd(amount)}
                 activeOpacity={0.7}
               >
-                <LinearGradient colors={[`${COLORS.blue}20`, `${COLORS.blue}05`] as [string,string]} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={[`${colors.blue}20`, `${colors.blue}05`] as [string,string]} style={StyleSheet.absoluteFill} />
                 <Text style={styles.quickEmoji}>{emoji}</Text>
-                <Text style={[styles.quickLabel, { color: COLORS.blue }]}>+{amount}L</Text>
-                <Text style={styles.quickDesc}>{label}</Text>
-                <Text style={styles.quickMl}>{desc}</Text>
+                <Text style={[styles.quickLabel, { color: colors.blue }]}>+{amount}L</Text>
+                <Text style={[styles.quickDesc, { color: colors.textSecondary }]}>{label}</Text>
+                <Text style={[styles.quickMl, { color: colors.textMuted }]}>{desc}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         {/* Milestones */}
-        <Card style={styles.milestonesCard}>
-          <Text style={styles.sectionTitle}>Milestones</Text>
+        <Card style={[styles.milestonesCard, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Milestones</Text>
           <View style={styles.milestonesRow}>
             {[
               { label: '25%', pctVal: 25, amount: waterGoal * 0.25 },
@@ -147,59 +153,58 @@ export default function WaterScreen() {
               const reached = pct >= m.pctVal;
               return (
                 <View key={m.label} style={styles.milestone}>
-                  <View style={[styles.milestoneCircle, reached && { backgroundColor: COLORS.blue, borderColor: COLORS.blue }]}>
-                    <Text style={styles.milestoneIcon}>{reached ? '✓' : m.label}</Text>
+                  <View style={[styles.milestoneCircle, { borderColor: colors.border }, reached && { backgroundColor: colors.blue, borderColor: colors.blue }]}>
+                    <Text style={[styles.milestoneIcon, { color: reached ? 'white' : colors.textMuted }]}>{reached ? '✓' : m.label}</Text>
                   </View>
-                  <Text style={[styles.milestoneAmt, { color: reached ? COLORS.blue : COLORS.textMuted }]}>
+                  <Text style={[styles.milestoneAmt, { color: reached ? colors.blue : colors.textMuted }]}>
                     {m.amount.toFixed(1)}L
                   </Text>
                 </View>
               );
             })}
           </View>
-          <ProgressBar value={pct} max={100} color={COLORS.blue} height={10} style={{ marginTop: SPACING.md }} />
+          <ProgressBar value={pct} max={100} color={colors.blue} height={10} style={{ marginTop: SPACING.md }} />
         </Card>
 
         {/* Weekly trend */}
-        <Card style={styles.weeklyCard}>
+        <Card style={[styles.weeklyCard, { backgroundColor: colors.card }]}>
           <View style={styles.weeklyHeader}>
-            <Text style={styles.sectionTitle}>Weekly Overview</Text>
-            <Text style={styles.weeklyAvg}>Avg: {weeklyAvg.toFixed(1)}L</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Weekly Overview</Text>
+            <Text style={[styles.weeklyAvg, { color: colors.blue }]}>Avg: {weeklyAvg.toFixed(1)}L</Text>
           </View>
           <View style={styles.weeklyBars}>
-            {weeklyWater.map(d => {
+            {weeklyWater.map((d: any) => {
               const barPct = Math.min(d.amount / waterGoal, 1);
               const isToday = d.day === new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
               return (
                 <View key={d.day} style={styles.weeklyBarCol}>
-                  <Text style={styles.weeklyBarAmt}>{d.amount.toFixed(1)}</Text>
-                  <View style={styles.weeklyBarTrack}>
+                  <Text style={[styles.weeklyBarAmt, { color: colors.textMuted }]}>{d.amount.toFixed(1)}</Text>
+                  <View style={[styles.weeklyBarTrack, { backgroundColor: colors.surface }]}>
                     <LinearGradient
-                      colors={isToday ? [COLORS.primary, COLORS.primaryLight] as [string,string] : [COLORS.blue, '#60A5FA'] as [string,string]}
+                      colors={isToday ? [colors.primary, colors.primaryLight] as [string,string] : [colors.blue, '#60A5FA'] as [string,string]}
                       style={[styles.weeklyBarFill, { height: `${barPct * 100}%` }]}
                       start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }}
                     />
                   </View>
-                  <Text style={[styles.weeklyBarDay, isToday && { color: COLORS.primary, fontWeight: '800' }]}>{d.day}</Text>
+                  <Text style={[styles.weeklyBarDay, { color: colors.textMuted }, isToday && { color: colors.primary, fontWeight: '800' }]}>{d.day}</Text>
                 </View>
               );
             })}
           </View>
-          {/* Goal line label */}
-          <Text style={styles.goalLineLabel}>Goal: {waterGoal}L</Text>
+          <Text style={[styles.goalLineLabel, { color: colors.textMuted }]}>Goal: {waterGoal}L</Text>
         </Card>
 
         {/* Today's Log */}
-        <Card style={styles.logCard}>
-          <Text style={styles.sectionTitle}>Today's Log</Text>
+        <Card style={[styles.logCard, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Today's Log</Text>
           {waterLogs.length > 0 ? waterLogs.map(log => (
-            <View key={log.id} style={styles.logRow}>
+            <View key={log.id} style={[styles.logRow, { borderTopColor: colors.borderSubtle }]}>
               <Text style={styles.logEmoji}>💧</Text>
-              <Text style={[styles.logAmount, { color: COLORS.blue }]}>+{log.amount}L</Text>
-              <Text style={styles.logTime}>{log.time}</Text>
+              <Text style={[styles.logAmount, { color: colors.blue }]}>+{log.amount}L</Text>
+              <Text style={[styles.logTime, { color: colors.textMuted }]}>{(log as any).time || ''}</Text>
             </View>
           )) : (
-            <Text style={styles.emptyText}>No water logged today. Stay hydrated!</Text>
+            <Text style={[styles.emptyText, { color: colors.textMuted }]}>No water logged today. Stay hydrated!</Text>
           )}
         </Card>
 
@@ -209,7 +214,7 @@ export default function WaterScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.bg },
+  safe: { flex: 1 },
   scroll: { padding: SPACING.lg, paddingBottom: 32, gap: SPACING.lg },
   header: { gap: 4 },
   title: { fontSize: FONT.xl, fontWeight: '900', color: COLORS.textPrimary },
