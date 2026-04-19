@@ -1,0 +1,92 @@
+{
+  "logs": [
+    {
+      "id": "wo_001",
+      "date": "2024-04-19",
+      "name": "Morning Run",
+      "workoutType": "cardio",
+      "duration": 35,
+      "caloriesBurned": 320,
+      "intensity": "medium",
+      "emoji": "🏃"
+    },
+    {
+      "id": "wo_002",
+      "date": "2024-04-18",
+      "name": "Upper Body Strength",
+      "workoutType": "strength",
+      "duration": 50,
+      "caloriesBurned": 280,
+      "intensity": "high",
+      "emoji": "🏋️"
+    },
+    {
+      "id": "wo_003",
+      "date": "2024-04-17",
+      "name": "Yoga Flow",
+      "workoutType": "yoga",
+      "duration": 40,
+      "caloriesBurned": 150,
+      "intensity": "low",
+      "emoji": "🧘"
+    },
+    {
+      "id": "wo_004",
+      "date": "2024-04-16",
+      "name": "HIIT Circuit",
+      "workoutType": "hiit",
+      "duration": 25,
+      "caloriesBurned": 380,
+      "intensity": "high",
+      "emoji": "⚡"
+    },
+    {
+      "id": "wo_005",
+      "date": "2024-04-15",
+      "name": "Cycling",
+      "workoutType": "cycling",
+      "duration": 60,
+      "caloriesBurned": 420,
+      "intensity": "medium",
+      "emoji": "🚴"
+    },
+    {
+      "id": "wo_006",
+      "date": "2024-04-13",
+      "name": "Lower Body Strength",
+      "workoutType": "strength",
+      "duration": 55,
+      "caloriesBurned": 310,
+      "intensity": "high",
+      "emoji": "🏋️"
+    },
+    {
+      "id": "wo_007",
+      "date": "2024-04-12",
+      "name": "Swimming",
+      "workoutType": "swimming",
+      "duration": 45,
+      "caloriesBurned": 390,
+      "intensity": "medium",
+      "emoji": "🏊"
+    }
+  ],
+  "weeklyPlan": [
+    { "day": "Monday", "dayIndex": 1, "workout": "Upper Body Strength", "duration": 50, "type": "strength", "emoji": "🏋️", "planned": true },
+    { "day": "Tuesday", "dayIndex": 2, "workout": "Rest Day", "duration": 0, "type": "rest", "emoji": "🛌", "planned": false },
+    { "day": "Wednesday", "dayIndex": 3, "workout": "HIIT Cardio", "duration": 30, "type": "hiit", "emoji": "⚡", "planned": true },
+    { "day": "Thursday", "dayIndex": 4, "workout": "Yoga & Stretch", "duration": 40, "type": "yoga", "emoji": "🧘", "planned": true },
+    { "day": "Friday", "dayIndex": 5, "workout": "Lower Body Strength", "duration": 50, "type": "strength", "emoji": "🏋️", "planned": true },
+    { "day": "Saturday", "dayIndex": 6, "workout": "Long Run", "duration": 60, "type": "cardio", "emoji": "🏃", "planned": true },
+    { "day": "Sunday", "dayIndex": 0, "workout": "Active Recovery", "duration": 30, "type": "yoga", "emoji": "🧘", "planned": true }
+  ],
+  "weeklyMinutes": [
+    { "day": "Mon", "minutes": 50 },
+    { "day": "Tue", "minutes": 0 },
+    { "day": "Wed", "minutes": 25 },
+    { "day": "Thu", "minutes": 40 },
+    { "day": "Fri", "minutes": 60 },
+    { "day": "Sat", "minutes": 55 },
+    { "day": "Sun", "minutes": 35 }
+  ]
+}

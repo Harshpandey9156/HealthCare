@@ -1,0 +1,41 @@
+{
+  "user": {
+    "id": "user_001",
+    "name": "Alex Johnson",
+    "email": "alex@example.com",
+    "avatar": null,
+    "age": 28,
+    "gender": "male",
+    "height": 178,
+    "weight": 75.5,
+    "targetWeight": 72.0,
+    "calorieGoal": 2200,
+    "waterGoal": 3.0,
+    "isPremium": true,
+    "points": 1240,
+    "referralCode": "ALEX2024",
+    "activityLevel": "moderate",
+    "joinedAt": "2024-01-15T00:00:00.000Z"
+  },
+  "streaks": {
+    "overall": { "current": 12, "longest": 28 },
+    "food": { "current": 8, "longest": 21 },
+    "workout": { "current": 5, "longest": 14 },
+    "water": { "current": 12, "longest": 30 }
+  },
+  "leaderboard": [
+    { "rank": 1, "name": "Sarah K.", "points": 2100, "streak": 30, "avatar": null },
+    { "rank": 2, "name": "Mike R.", "points": 1850, "streak": 22, "avatar": null },
+    { "rank": 3, "name": "Alex Johnson", "points": 1240, "streak": 12, "avatar": null, "isCurrentUser": true },
+    { "rank": 4, "name": "Emma L.", "points": 980, "streak": 8, "avatar": null },
+    { "rank": 5, "name": "Chris M.", "points": 760, "streak": 5, "avatar": null }
+  ],
+  "badges": [
+    { "id": "first_log", "label": "First Step", "emoji": "🌱", "earned": true },
+    { "id": "week_streak", "label": "Week Warrior", "emoji": "🔥", "earned": true },
+    { "id": "hydration_hero", "label": "Hydration Hero", "emoji": "💧", "earned": true },
+    { "id": "workout_beast", "label": "Workout Beast", "emoji": "🏋️", "earned": false },
+    { "id": "century", "label": "Century Club", "emoji": "💯", "earned": true },
+    { "id": "consistent", "label": "Consistent", "emoji": "⭐", "earned": false }
+  ]
+}

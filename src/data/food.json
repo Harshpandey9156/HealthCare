@@ -1,0 +1,91 @@
+{
+  "today": {
+    "date": "2024-04-19",
+    "meals": [
+      {
+        "id": "meal_001",
+        "mealType": "breakfast",
+        "foodName": "Oatmeal with Berries",
+        "calories": 320,
+        "protein": 12,
+        "carbs": 52,
+        "fats": 6,
+        "fiber": 8,
+        "calcium": 120,
+        "iron": 2.5,
+        "magnesium": 45,
+        "time": "08:15 AM"
+      },
+      {
+        "id": "meal_002",
+        "mealType": "breakfast",
+        "foodName": "Greek Yogurt",
+        "calories": 100,
+        "protein": 17,
+        "carbs": 6,
+        "fats": 0.7,
+        "fiber": 0,
+        "calcium": 200,
+        "iron": 0.1,
+        "magnesium": 18,
+        "time": "08:30 AM"
+      },
+      {
+        "id": "meal_003",
+        "mealType": "lunch",
+        "foodName": "Chicken Breast Salad",
+        "calories": 420,
+        "protein": 38,
+        "carbs": 22,
+        "fats": 14,
+        "fiber": 5,
+        "calcium": 80,
+        "iron": 1.8,
+        "magnesium": 52,
+        "time": "12:45 PM"
+      },
+      {
+        "id": "meal_004",
+        "mealType": "snack",
+        "foodName": "Mixed Nuts (30g)",
+        "calories": 173,
+        "protein": 6,
+        "carbs": 6,
+        "fats": 15,
+        "fiber": 3,
+        "calcium": 30,
+        "iron": 0.9,
+        "magnesium": 35,
+        "time": "03:30 PM"
+      }
+    ],
+    "totalCalories": 1013,
+    "totalProtein": 73,
+    "totalCarbs": 86,
+    "totalFats": 35.7,
+    "totalFiber": 16
+  },
+  "calorieTrend": [
+    { "day": "Mon", "calories": 1850, "date": "2024-04-13" },
+    { "day": "Tue", "calories": 2100, "date": "2024-04-14" },
+    { "day": "Wed", "calories": 1920, "date": "2024-04-15" },
+    { "day": "Thu", "calories": 2250, "date": "2024-04-16" },
+    { "day": "Fri", "calories": 1780, "date": "2024-04-17" },
+    { "day": "Sat", "calories": 2400, "date": "2024-04-18" },
+    { "day": "Sun", "calories": 1013, "date": "2024-04-19" }
+  ],
+  "foodDatabase": [
+    { "id": "db_001", "name": "Banana", "calories": 89, "protein": 1.1, "carbs": 23, "fats": 0.3, "fiber": 2.6, "servingUnit": "medium" },
+    { "id": "db_002", "name": "Boiled Egg", "calories": 78, "protein": 6.3, "carbs": 0.6, "fats": 5.3, "fiber": 0, "servingUnit": "piece" },
+    { "id": "db_003", "name": "Oatmeal (1 cup)", "calories": 166, "protein": 5.9, "carbs": 28, "fats": 3.6, "fiber": 4, "servingUnit": "cup" },
+    { "id": "db_004", "name": "Chicken Breast (100g)", "calories": 165, "protein": 31, "carbs": 0, "fats": 3.6, "fiber": 0, "servingUnit": "100g" },
+    { "id": "db_005", "name": "Brown Rice (1 cup)", "calories": 216, "protein": 5, "carbs": 45, "fats": 1.8, "fiber": 3.5, "servingUnit": "cup" },
+    { "id": "db_006", "name": "Greek Yogurt (150g)", "calories": 100, "protein": 17, "carbs": 6, "fats": 0.7, "fiber": 0, "servingUnit": "150g" },
+    { "id": "db_007", "name": "Almonds (30g)", "calories": 173, "protein": 6, "carbs": 6, "fats": 15, "fiber": 3, "servingUnit": "30g" },
+    { "id": "db_008", "name": "Avocado (half)", "calories": 120, "protein": 1.5, "carbs": 6, "fats": 11, "fiber": 5, "servingUnit": "half" },
+    { "id": "db_009", "name": "Whole Milk (240ml)", "calories": 149, "protein": 8, "carbs": 12, "fats": 8, "fiber": 0, "servingUnit": "240ml" },
+    { "id": "db_010", "name": "Salmon (100g)", "calories": 208, "protein": 20, "carbs": 0, "fats": 13, "fiber": 0, "servingUnit": "100g" },
+    { "id": "db_011", "name": "Sweet Potato (medium)", "calories": 103, "protein": 2.3, "carbs": 24, "fats": 0.1, "fiber": 3.8, "servingUnit": "medium" },
+    { "id": "db_012", "name": "Protein Shake", "calories": 130, "protein": 25, "carbs": 5, "fats": 2, "fiber": 1, "servingUnit": "scoop" }
+  ]
+}
