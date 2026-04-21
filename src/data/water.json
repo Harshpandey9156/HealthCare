@@ -1,23 +1,20 @@
 {
-  "today": {
-    "date": "2024-04-19",
-    "total": 1.75,
-    "goal": 3.0,
-    "logs": [
-      { "id": "water_001", "amount": 0.25, "time": "07:30 AM" },
-      { "id": "water_002", "amount": 0.5, "time": "09:00 AM" },
-      { "id": "water_003", "amount": 0.5, "time": "11:30 AM" },
-      { "id": "water_004", "amount": 0.25, "time": "01:00 PM" },
-      { "id": "water_005", "amount": 0.25, "time": "03:30 PM" }
-    ]
-  },
+  "logs": [
+    { "id": "water_001", "amount": 0.25, "time": "07:30 AM" },
+    { "id": "water_002", "amount": 0.5,  "time": "09:00 AM" },
+    { "id": "water_003", "amount": 0.25, "time": "11:15 AM" },
+    { "id": "water_004", "amount": 0.5,  "time": "01:00 PM" },
+    { "id": "water_005", "amount": 0.25, "time": "03:30 PM" }
+  ],
+  "total": 1.75,
+  "goal": 2.5,
   "weeklyTrend": [
-    { "day": "Mon", "amount": 2.8 },
-    { "day": "Tue", "amount": 3.2 },
-    { "day": "Wed", "amount": 2.5 },
-    { "day": "Thu", "amount": 3.5 },
-    { "day": "Fri", "amount": 3.0 },
-    { "day": "Sat", "amount": 2.2 },
+    { "day": "Mon", "amount": 2.5  },
+    { "day": "Tue", "amount": 2.0  },
+    { "day": "Wed", "amount": 3.0  },
+    { "day": "Thu", "amount": 1.8  },
+    { "day": "Fri", "amount": 2.3  },
+    { "day": "Sat", "amount": 2.5  },
     { "day": "Sun", "amount": 1.75 }
   ]
 }

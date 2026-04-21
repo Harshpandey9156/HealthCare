@@ -47,12 +47,10 @@ export const DARK_COLORS = {
   walking: '#8B5CF6',
   rest: '#475569',
 
-  // Input/form
   inputBg: '#13131F',
   inputBorder: '#2E2E4A',
   placeholder: '#475569',
 
-  // Status bar
   statusBar: 'light' as 'light' | 'dark',
 };
 
@@ -103,46 +101,56 @@ export const LIGHT_COLORS = {
   walking: '#7C3AED',
   rest: '#94A3B8',
 
-  // Input/form
   inputBg: '#FFFFFF',
   inputBorder: '#E2E8F0',
   placeholder: '#94A3B8',
 
-  // Status bar
   statusBar: 'dark' as 'light' | 'dark',
 };
 
-// Default export (legacy — will be replaced by useTheme())
+// Default export (legacy — screens that don't use useTheme() fall back to dark)
 export const COLORS = DARK_COLORS;
 
-// ─── Returns colors for the given mode ───────────────────────────────────────
+// Returns colors for the given mode
 export function getThemeColors(mode: 'dark' | 'light') {
   return mode === 'dark' ? DARK_COLORS : LIGHT_COLORS;
 }
 
-// ─── Gradient definitions ─────────────────────────────────────────────────────
-export const DARK_GRADIENTS = {
-  primary: ['#6366F1', '#818CF8'] as const,
-  hero: ['#0F0F1F', '#1A0A2E', '#0A1628'] as const,
-  card: ['#13131F', '#1A1A2E'] as const,
-  green: ['#10B981', '#34D399'] as const,
-  orange: ['#F59E0B', '#FBBF24'] as const,
-  red: ['#EF4444', '#F87171'] as const,
-  blue: ['#3B82F6', '#60A5FA'] as const,
-  purple: ['#8B5CF6', '#A78BFA'] as const,
-  brand: ['#6366F1', '#EC4899', '#F59E0B'] as const,
+// ─── Gradient definitions (string[] so dark/light are interchangeable) ────────
+export interface GradientPalette {
+  primary: string[];
+  hero:    string[];
+  card:    string[];
+  green:   string[];
+  orange:  string[];
+  red:     string[];
+  blue:    string[];
+  purple:  string[];
+  brand:   string[];
+}
+
+export const DARK_GRADIENTS: GradientPalette = {
+  primary: ['#6366F1', '#818CF8'],
+  hero:    ['#0F0F1F', '#1A0A2E', '#0A1628'],
+  card:    ['#13131F', '#1A1A2E'],
+  green:   ['#10B981', '#34D399'],
+  orange:  ['#F59E0B', '#FBBF24'],
+  red:     ['#EF4444', '#F87171'],
+  blue:    ['#3B82F6', '#60A5FA'],
+  purple:  ['#8B5CF6', '#A78BFA'],
+  brand:   ['#6366F1', '#EC4899', '#F59E0B'],
 };
 
-export const LIGHT_GRADIENTS = {
-  primary: ['#6366F1', '#818CF8'] as const,
-  hero: ['#EEF2FF', '#F5F3FF', '#EFF6FF'] as const,
-  card: ['#FFFFFF', '#F8FAFC'] as const,
-  green: ['#059669', '#34D399'] as const,
-  orange: ['#D97706', '#FBBF24'] as const,
-  red: ['#DC2626', '#F87171'] as const,
-  blue: ['#2563EB', '#60A5FA'] as const,
-  purple: ['#7C3AED', '#A78BFA'] as const,
-  brand: ['#6366F1', '#EC4899', '#F59E0B'] as const,
+export const LIGHT_GRADIENTS: GradientPalette = {
+  primary: ['#6366F1', '#818CF8'],
+  hero:    ['#EEF2FF', '#F5F3FF', '#EFF6FF'],
+  card:    ['#FFFFFF', '#F8FAFC'],
+  green:   ['#059669', '#34D399'],
+  orange:  ['#D97706', '#FBBF24'],
+  red:     ['#DC2626', '#F87171'],
+  blue:    ['#2563EB', '#60A5FA'],
+  purple:  ['#7C3AED', '#A78BFA'],
+  brand:   ['#6366F1', '#EC4899', '#F59E0B'],
 };
 
 export const GRADIENTS = DARK_GRADIENTS;
@@ -161,25 +169,25 @@ export const FONT = {
 };
 
 export const SHADOW = {
-  sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
-  md: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 6 },
+  sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4,  elevation: 3  },
+  md: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 8,  elevation: 6  },
   lg: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.16, shadowRadius: 16, elevation: 10 },
 };
 
 export const MEAL_CONFIG: Record<string, { label: string; emoji: string; color: string }> = {
-  breakfast: { label: 'Breakfast', emoji: '☀️', color: DARK_COLORS.breakfast },
+  breakfast: { label: 'Breakfast', emoji: '☀️',  color: DARK_COLORS.breakfast },
   lunch:     { label: 'Lunch',     emoji: '🌤️', color: DARK_COLORS.lunch },
-  snack:     { label: 'Snack',     emoji: '🍎', color: DARK_COLORS.snack },
-  dinner:    { label: 'Dinner',    emoji: '🌙', color: DARK_COLORS.dinner },
+  snack:     { label: 'Snack',     emoji: '🍎',  color: DARK_COLORS.snack },
+  dinner:    { label: 'Dinner',    emoji: '🌙',  color: DARK_COLORS.dinner },
 };
 
 export const WORKOUT_CONFIG: Record<string, { label: string; emoji: string; color: string }> = {
   strength: { label: 'Strength', emoji: '🏋️', color: DARK_COLORS.strength },
-  cardio:   { label: 'Cardio',   emoji: '🏃', color: DARK_COLORS.cardio },
-  yoga:     { label: 'Yoga',     emoji: '🧘', color: DARK_COLORS.yoga },
-  hiit:     { label: 'HIIT',     emoji: '⚡', color: DARK_COLORS.hiit },
-  cycling:  { label: 'Cycling',  emoji: '🚴', color: DARK_COLORS.cycling },
-  swimming: { label: 'Swimming', emoji: '🏊', color: DARK_COLORS.swimming },
-  walking:  { label: 'Walking',  emoji: '🚶', color: DARK_COLORS.walking },
-  rest:     { label: 'Rest',     emoji: '🛌', color: DARK_COLORS.rest },
+  cardio:   { label: 'Cardio',   emoji: '🏃',  color: DARK_COLORS.cardio },
+  yoga:     { label: 'Yoga',     emoji: '🧘',  color: DARK_COLORS.yoga },
+  hiit:     { label: 'HIIT',     emoji: '⚡',  color: DARK_COLORS.hiit },
+  cycling:  { label: 'Cycling',  emoji: '🚴',  color: DARK_COLORS.cycling },
+  swimming: { label: 'Swimming', emoji: '🏊',  color: DARK_COLORS.swimming },
+  walking:  { label: 'Walking',  emoji: '🚶',  color: DARK_COLORS.walking },
+  rest:     { label: 'Rest',     emoji: '🛌',  color: DARK_COLORS.rest },
 };

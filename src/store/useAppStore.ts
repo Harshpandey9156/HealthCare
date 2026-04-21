@@ -23,6 +23,17 @@ export interface FoodLog {
   magnesium?: number;
 }
 
+export interface FoodItem {
+  id: string;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+  fiber: number;
+  servingUnit: string;
+}
+
 export interface WeightLog {
   id: string;
   date: string;
@@ -41,6 +52,15 @@ export interface WorkoutLog {
   emoji: string;
 }
 
+export interface WeeklyPlanDay {
+  day: string;
+  workout: string;
+  type: string;
+  duration: number;
+  planned: boolean;
+  emoji: string;
+}
+
 export interface WaterLog {
   id: string;
   amount: number;
@@ -54,46 +74,48 @@ interface AppStore {
   isAuthLoading: boolean;
   authError: string | null;
   user: AuthUser | null;
-  login: (payload: LoginPayload) => Promise<void>;
+  login:    (payload: LoginPayload)    => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
-  logout: () => Promise<void>;
-  loadUser: () => Promise<void>;
+  logout:   ()                         => Promise<void>;
+  loadUser: ()                         => Promise<void>;
 
   // ── Food ──
-  foodLogs: FoodLog[];
-  calorieTrend: { day: string; calories: number }[];
+  foodLogs:      FoodLog[];
+  foodDatabase:  FoodItem[];
+  calorieTrend:  { day: string; calories: number }[];
   isLoadingFood: boolean;
   todayCalories: number;
-  todayProtein: number;
-  todayCarbs: number;
-  todayFats: number;
-  todayFiber: number;
-  fetchFoodLogs: (date?: string) => Promise<void>;
-  addFoodLog: (log: Omit<FoodLog, 'id'>) => Promise<void>;
-  removeFoodLog: (id: string) => Promise<void>;
+  todayProtein:  number;
+  todayCarbs:    number;
+  todayFats:     number;
+  todayFiber:    number;
+  fetchFoodLogs: (date?: string)          => Promise<void>;
+  addFoodLog:    (log: Omit<FoodLog, 'id'>) => Promise<void>;
+  removeFoodLog: (id: string)              => Promise<void>;
 
   // ── Weight ──
-  weightLogs: WeightLog[];
-  isLoadingWeight: boolean;
-  fetchWeightLogs: () => Promise<void>;
-  addWeightLog: (log: Omit<WeightLog, 'id'>) => Promise<void>;
+  weightLogs:       WeightLog[];
+  isLoadingWeight:  boolean;
+  fetchWeightLogs:  ()                              => Promise<void>;
+  addWeightLog:     (log: Omit<WeightLog, 'id'>)   => Promise<void>;
 
   // ── Workout ──
-  workoutLogs: WorkoutLog[];
-  weeklyMinutes: { day: string; minutes: number }[];
+  workoutLogs:      WorkoutLog[];
+  weeklyMinutes:    { day: string; minutes: number }[];
+  weeklyPlan:       WeeklyPlanDay[];
   isLoadingWorkout: boolean;
-  fetchWorkoutLogs: (date?: string) => Promise<void>;
-  addWorkoutLog: (log: Omit<WorkoutLog, 'id'>) => Promise<void>;
-  removeWorkoutLog: (id: string) => Promise<void>;
+  fetchWorkoutLogs: (date?: string)                   => Promise<void>;
+  addWorkoutLog:    (log: Omit<WorkoutLog, 'id'>)     => Promise<void>;
+  removeWorkoutLog: (id: string)                       => Promise<void>;
 
   // ── Water ──
-  waterLogs: WaterLog[];
-  waterTotal: number;
-  waterGoal: number;
-  weeklyWater: { day: string; amount: number }[];
+  waterLogs:      WaterLog[];
+  waterTotal:     number;
+  waterGoal:      number;
+  weeklyWater:    { day: string; amount: number }[];
   isLoadingWater: boolean;
   fetchWaterLogs: (date?: string) => Promise<void>;
-  addWater: (amount: number) => Promise<void>;
+  addWater:       (amount: number) => Promise<void>;
 
   // ── Leaderboard ──
   leaderboard: {
@@ -103,43 +125,45 @@ interface AppStore {
   fetchProfile: () => Promise<void>;
 }
 
-// ─── Helper to normalise MongoDB _id → id ────────────────────────────────────
+// ─── Helper to normalise _id → id ────────────────────────────────────────────
 function normaliseId<T extends { _id?: string; id?: string }>(obj: T): T & { id: string } {
   return { ...obj, id: obj._id || obj.id || String(Date.now()) };
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 export const useAppStore = create<AppStore>((set, get) => ({
-  // ── Auth initial state ──
+  // ── Auth ──
   isAuthenticated: false,
-  isAuthLoading: false,
-  authError: null,
-  user: null,
+  isAuthLoading:   false,
+  authError:       null,
+  user:            null,
 
-  // ── Food initial state ──
-  foodLogs: [],
-  calorieTrend: [],
+  // ── Food ──
+  foodLogs:      [],
+  foodDatabase:  foodService.getFoodDatabase(),
+  calorieTrend:  [],
   isLoadingFood: false,
   todayCalories: 0,
-  todayProtein: 0,
-  todayCarbs: 0,
-  todayFats: 0,
-  todayFiber: 0,
+  todayProtein:  0,
+  todayCarbs:    0,
+  todayFats:     0,
+  todayFiber:    0,
 
-  // ── Weight initial state ──
-  weightLogs: [],
+  // ── Weight ──
+  weightLogs:      [],
   isLoadingWeight: false,
 
-  // ── Workout initial state ──
-  workoutLogs: [],
-  weeklyMinutes: [],
+  // ── Workout ──
+  workoutLogs:      [],
+  weeklyMinutes:    [],
+  weeklyPlan:       workoutService.getWeeklyPlan() as WeeklyPlanDay[],
   isLoadingWorkout: false,
 
-  // ── Water initial state ──
-  waterLogs: [],
-  waterTotal: 0,
-  waterGoal: 2.5,
-  weeklyWater: [],
+  // ── Water ──
+  waterLogs:      [],
+  waterTotal:     0,
+  waterGoal:      2.5,
+  weeklyWater:    [],
   isLoadingWater: false,
 
   // ── Leaderboard ──
@@ -206,13 +230,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       const data = await foodService.getLogs(date);
       set({
-        foodLogs: (data.logs || []).map(normaliseId),
-        calorieTrend: data.trend || [],
+        foodLogs:      (data.logs || []).map(normaliseId),
+        calorieTrend:  data.trend || [],
         todayCalories: data.totals?.calories || 0,
-        todayProtein: data.totals?.protein || 0,
-        todayCarbs: data.totals?.carbs || 0,
-        todayFats: data.totals?.fats || 0,
-        todayFiber: data.totals?.fiber || 0,
+        todayProtein:  data.totals?.protein  || 0,
+        todayCarbs:    data.totals?.carbs    || 0,
+        todayFats:     data.totals?.fats     || 0,
+        todayFiber:    data.totals?.fiber    || 0,
         isLoadingFood: false,
       });
     } catch {
@@ -225,12 +249,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const newLog = await foodService.addLog(log);
       const nl = normaliseId(newLog);
       set((state) => ({
-        foodLogs: [...state.foodLogs, nl],
+        foodLogs:      [...state.foodLogs, nl],
         todayCalories: state.todayCalories + nl.calories,
-        todayProtein: state.todayProtein + nl.protein,
-        todayCarbs: state.todayCarbs + nl.carbs,
-        todayFats: state.todayFats + nl.fats,
-        todayFiber: state.todayFiber + nl.fiber,
+        todayProtein:  state.todayProtein  + nl.protein,
+        todayCarbs:    state.todayCarbs    + nl.carbs,
+        todayFats:     state.todayFats     + nl.fats,
+        todayFiber:    state.todayFiber    + nl.fiber,
       }));
     } catch (err) {
       throw err;
@@ -240,12 +264,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
   removeFoodLog: async (id) => {
     const log = get().foodLogs.find((l) => l.id === id);
     if (!log) return;
+    // Optimistic update
     set((state) => ({
-      foodLogs: state.foodLogs.filter((l) => l.id !== id),
+      foodLogs:      state.foodLogs.filter((l) => l.id !== id),
       todayCalories: Math.max(0, state.todayCalories - log.calories),
-      todayProtein: Math.max(0, state.todayProtein - log.protein),
-      todayCarbs: Math.max(0, state.todayCarbs - log.carbs),
-      todayFats: Math.max(0, state.todayFats - log.fats),
+      todayProtein:  Math.max(0, state.todayProtein  - log.protein),
+      todayCarbs:    Math.max(0, state.todayCarbs    - log.carbs),
+      todayFats:     Math.max(0, state.todayFats     - log.fats),
     }));
     try {
       await foodService.removeLog(id);
@@ -288,8 +313,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       const data = await workoutService.getLogs(date);
       set({
-        workoutLogs: (data.allLogs || data.logs || []).map(normaliseId),
-        weeklyMinutes: data.weeklyMinutes || [],
+        workoutLogs:      (data.allLogs || data.logs || []).map(normaliseId),
+        weeklyMinutes:    data.weeklyMinutes || [],
+        weeklyPlan:       (data.weeklyPlan   || []) as WeeklyPlanDay[],
         isLoadingWorkout: false,
       });
     } catch {
@@ -323,10 +349,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       const data = await waterService.getLogs(date);
       set({
-        waterLogs: (data.logs || []).map(normaliseId),
-        waterTotal: data.total || 0,
-        waterGoal: data.goal || 2.5,
-        weeklyWater: (data.weeklyTrend || []).map((t: any) => ({ day: t.day, amount: t.amount })),
+        waterLogs:      (data.logs || []).map(normaliseId),
+        waterTotal:     data.total || 0,
+        waterGoal:      data.goal  || 2.5,
+        weeklyWater:    (data.weeklyTrend || []).map((t: any) => ({ day: t.day, amount: t.amount })),
         isLoadingWater: false,
       });
     } catch {
@@ -339,7 +365,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const newLog = await waterService.addLog(amount);
       const nl = normaliseId(newLog);
       set((state) => ({
-        waterLogs: [...state.waterLogs, nl],
+        waterLogs:  [...state.waterLogs, nl],
         waterTotal: parseFloat((state.waterTotal + amount).toFixed(2)),
       }));
     } catch (err) {
@@ -355,8 +381,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       const data = await userService.getProfile();
       set({
-        user: data.user,
-        leaderboard: data.leaderboard || [],
+        user:        data.user,
+        leaderboard: (data.leaderboard || []).map((e: any) => ({
+          rank:          e.rank,
+          name:          e.name,
+          points:        e.points,
+          streak:        e.streak,
+          avatar:        null,
+          isCurrentUser: e.isCurrentUser || false,
+        })),
       });
     } catch {}
   },

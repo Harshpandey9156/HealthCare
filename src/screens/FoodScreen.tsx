@@ -5,14 +5,12 @@ import {
   TextInput, Modal, FlatList, Alert, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 import { useAppStore, FoodLog } from '../store/useAppStore';
 import { Card } from '../components/ui/Card';
 import { ProgressBar } from '../components/ui/ProgressBar';
 import { Badge } from '../components/ui/Badge';
 import { COLORS, FONT, SPACING, RADIUS, MEAL_CONFIG } from '../constants/theme';
-
-const { width: W } = Dimensions.get('window');
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'snack', 'dinner'];
 
@@ -26,23 +24,24 @@ function MacroPill({ label, value, color }: { label: string; value: number; colo
 }
 
 export default function FoodScreen() {
-  const { foodLogs, todayCalories, todayProtein, todayCarbs, todayFats,
-    addFoodLog, removeFoodLog, foodDatabase, user } = useAppStore();
+  const {
+    foodLogs, todayCalories, todayProtein, todayCarbs, todayFats,
+    addFoodLog, removeFoodLog, foodDatabase, user,
+  } = useAppStore();
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState('breakfast');
   const [search, setSearch] = useState('');
   const [manualMode, setManualMode] = useState(false);
-
-  // Manual form state
   const [form, setForm] = useState({
     foodName: '', calories: '', protein: '', carbs: '', fats: '', fiber: '',
     calcium: '', iron: '', magnesium: '',
   });
 
-  const calorieGoal = user.calorieGoal;
+  const calorieGoal = user?.calorieGoal || 2000;
   const calPct = Math.min(Math.round((todayCalories / calorieGoal) * 100), 100);
 
-  const filteredDB = foodDatabase.filter(f =>
+  const filteredDB = (foodDatabase || []).filter((f) =>
     f.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -52,10 +51,10 @@ export default function FoodScreen() {
       mealType: selectedMeal,
       foodName: food.name,
       calories: food.calories,
-      protein: food.protein,
-      carbs: food.carbs,
-      fats: food.fats,
-      fiber: food.fiber,
+      protein:  food.protein,
+      carbs:    food.carbs,
+      fats:     food.fats,
+      fiber:    food.fiber,
       time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     });
     setShowAddModal(false);
@@ -69,47 +68,44 @@ export default function FoodScreen() {
     }
     const now = new Date();
     addFoodLog({
-      mealType: selectedMeal,
-      foodName: form.foodName,
-      calories: parseFloat(form.calories) || 0,
-      protein: parseFloat(form.protein) || 0,
-      carbs: parseFloat(form.carbs) || 0,
-      fats: parseFloat(form.fats) || 0,
-      fiber: parseFloat(form.fiber) || 0,
+      mealType:  selectedMeal,
+      foodName:  form.foodName,
+      calories:  parseFloat(form.calories) || 0,
+      protein:   parseFloat(form.protein)  || 0,
+      carbs:     parseFloat(form.carbs)    || 0,
+      fats:      parseFloat(form.fats)     || 0,
+      fiber:     parseFloat(form.fiber)    || 0,
       time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      calcium: parseFloat(form.calcium) || undefined,
-      iron: parseFloat(form.iron) || undefined,
+      calcium:   parseFloat(form.calcium)   || undefined,
+      iron:      parseFloat(form.iron)      || undefined,
       magnesium: parseFloat(form.magnesium) || undefined,
     });
-    setForm({ foodName: '', calories: '', protein: '', carbs: '', fats: '', fiber: '', calcium: '', iron: '', magnesium: '' });
+    setForm({ foodName:'', calories:'', protein:'', carbs:'', fats:'', fiber:'', calcium:'', iron:'', magnesium:'' });
     setShowAddModal(false);
   };
 
-  const mealGroups = MEAL_TYPES.map(type => ({
+  const mealGroups = MEAL_TYPES.map((type) => ({
     type,
     config: MEAL_CONFIG[type],
-    logs: foodLogs.filter(l => l.mealType === type),
-    total: foodLogs.filter(l => l.mealType === type).reduce((s, l) => s + l.calories, 0),
+    logs:  foodLogs.filter((l) => l.mealType === type),
+    total: foodLogs.filter((l) => l.mealType === type).reduce((s, l) => s + l.calories, 0),
   }));
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Food Tracker 🍽️</Text>
             <Text style={styles.subtitle}>Track your daily nutrition</Text>
           </View>
           <TouchableOpacity style={styles.addBtn} onPress={() => setShowAddModal(true)}>
-            <LinearGradient colors={[COLORS.primary, COLORS.primaryLight] as [string,string]} style={styles.addBtnGrad}>
+            <LinearGradient colors={[COLORS.primary, COLORS.primaryLight]} style={styles.addBtnGrad}>
               <Text style={styles.addBtnText}>+ Log</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Summary Card */}
         <Card style={styles.summaryCard} elevated>
           <View style={styles.summaryTop}>
             <View>
@@ -118,13 +114,15 @@ export default function FoodScreen() {
             </View>
             <View style={styles.summaryPillsCol}>
               <MacroPill label="Protein" value={todayProtein} color={COLORS.primary} />
-              <MacroPill label="Carbs" value={todayCarbs} color={COLORS.orange} />
-              <MacroPill label="Fats" value={todayFats} color={COLORS.red} />
+              <MacroPill label="Carbs"   value={todayCarbs}   color={COLORS.orange} />
+              <MacroPill label="Fats"    value={todayFats}    color={COLORS.red} />
             </View>
           </View>
-          <ProgressBar value={todayCalories} max={calorieGoal}
+          <ProgressBar
+            value={todayCalories} max={calorieGoal}
             color={calPct > 100 ? COLORS.red : calPct > 80 ? COLORS.orange : COLORS.green}
-            height={10} style={{ marginTop: SPACING.md }} />
+            height={10} style={{ marginTop: SPACING.md }}
+          />
           <View style={styles.summaryFooter}>
             <Text style={styles.summaryFooterText}>0 kcal</Text>
             <Text style={[styles.summaryFooterText, { color: COLORS.primary }]}>{calPct}%</Text>
@@ -132,10 +130,8 @@ export default function FoodScreen() {
           </View>
         </Card>
 
-        {/* Meal Groups */}
         {mealGroups.map(({ type, config, logs, total }) => (
           <Card key={type} style={styles.mealCard}>
-            {/* Meal Header */}
             <View style={styles.mealHeader}>
               <View style={[styles.mealIcon, { backgroundColor: `${config.color}20` }]}>
                 <Text style={styles.mealIconText}>{config.emoji}</Text>
@@ -144,20 +140,20 @@ export default function FoodScreen() {
                 <Text style={styles.mealTitle}>{config.label}</Text>
                 {total > 0 && <Text style={[styles.mealTotal, { color: config.color }]}>{Math.round(total)} kcal</Text>}
               </View>
-              <TouchableOpacity onPress={() => { setSelectedMeal(type); setShowAddModal(true); }}
-                style={[styles.mealAddBtn, { borderColor: config.color }]}>
+              <TouchableOpacity
+                onPress={() => { setSelectedMeal(type); setShowAddModal(true); }}
+                style={[styles.mealAddBtn, { borderColor: config.color }]}
+              >
                 <Text style={[styles.mealAddBtnText, { color: config.color }]}>+ Add</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Logs */}
-            {logs.length > 0 ? logs.map(log => (
+            {logs.length > 0 ? logs.map((log) => (
               <View key={log.id} style={styles.logRow}>
                 <View style={styles.logInfo}>
                   <Text style={styles.logName}>{log.foodName}</Text>
                   <Text style={styles.logMacros}>
                     P:{Math.round(log.protein)}g · C:{Math.round(log.carbs)}g · F:{Math.round(log.fats)}g
-                    {user.isPremium && log.calcium ? `  |  Ca:${log.calcium}mg` : ''}
+                    {user?.isPremium && log.calcium ? `  |  Ca:${log.calcium}mg` : ''}
                   </Text>
                 </View>
                 <Text style={[styles.logCal, { color: config.color }]}>{Math.round(log.calories)}</Text>
@@ -171,18 +167,17 @@ export default function FoodScreen() {
           </Card>
         ))}
 
-        {/* Premium Micronutrients */}
-        {user.isPremium && (
+        {user?.isPremium && (
           <Card style={styles.microCard}>
             <View style={styles.microHeader}>
               <Text style={styles.microTitle}>💎 Micronutrients</Text>
               <Badge label="PREMIUM" color={COLORS.yellow} />
             </View>
             {[
-              { label: 'Calcium', emoji: '🦴', value: foodLogs.reduce((s, l) => s + (l.calcium || 0), 0), goal: 1000, unit: 'mg' },
-              { label: 'Iron', emoji: '⚡', value: foodLogs.reduce((s, l) => s + (l.iron || 0), 0), goal: 18, unit: 'mg' },
-              { label: 'Magnesium', emoji: '🌿', value: foodLogs.reduce((s, l) => s + (l.magnesium || 0), 0), goal: 400, unit: 'mg' },
-            ].map(m => (
+              { label: 'Calcium',   emoji: '🦴', value: foodLogs.reduce((s, l) => s + (l.calcium   || 0), 0), goal: 1000, unit: 'mg' },
+              { label: 'Iron',      emoji: '⚡', value: foodLogs.reduce((s, l) => s + (l.iron      || 0), 0), goal: 18,   unit: 'mg' },
+              { label: 'Magnesium', emoji: '🌿', value: foodLogs.reduce((s, l) => s + (l.magnesium || 0), 0), goal: 400,  unit: 'mg' },
+            ].map((m) => (
               <View key={m.label} style={styles.microRow}>
                 <Text style={styles.microEmoji}>{m.emoji}</Text>
                 <View style={styles.microInfo}>
@@ -190,9 +185,11 @@ export default function FoodScreen() {
                     <Text style={styles.microLabel}>{m.label}</Text>
                     <Text style={styles.microValue}>{Math.round(m.value)}/{m.goal}{m.unit}</Text>
                   </View>
-                  <ProgressBar value={m.value} max={m.goal}
+                  <ProgressBar
+                    value={m.value} max={m.goal}
                     color={m.value < m.goal * 0.5 ? COLORS.red : m.value < m.goal * 0.8 ? COLORS.orange : COLORS.green}
-                    height={5} />
+                    height={5}
+                  />
                   {m.value < m.goal * 0.5 && (
                     <Text style={styles.microAlert}>⚠️ Low — consider {m.label === 'Calcium' ? 'dairy or leafy greens' : m.label === 'Iron' ? 'lean meats or legumes' : 'nuts or seeds'}</Text>
                   )}
@@ -201,23 +198,18 @@ export default function FoodScreen() {
             ))}
           </Card>
         )}
-
       </ScrollView>
 
-      {/* Add Food Modal */}
       <Modal visible={showAddModal} animationType="slide" presentationStyle="pageSheet">
         <View style={styles.modal}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Log Food</Text>
-            <TouchableOpacity onPress={() => { setShowAddModal(false); setSearch(''); setManualMode(false); }}
-              style={styles.modalClose}>
+            <TouchableOpacity onPress={() => { setShowAddModal(false); setSearch(''); setManualMode(false); }} style={styles.modalClose}>
               <Text style={styles.modalCloseText}>✕</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Meal type selector */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mealSelector}>
-            {MEAL_TYPES.map(type => {
+            {MEAL_TYPES.map((type) => {
               const cfg = MEAL_CONFIG[type];
               const active = selectedMeal === type;
               return (
@@ -229,27 +221,22 @@ export default function FoodScreen() {
               );
             })}
           </ScrollView>
-
-          {/* Toggle */}
           <View style={styles.modeToggle}>
-            <TouchableOpacity style={[styles.modeBtn, !manualMode && styles.modeBtnActive]}
-              onPress={() => setManualMode(false)}>
+            <TouchableOpacity style={[styles.modeBtn, !manualMode && styles.modeBtnActive]} onPress={() => setManualMode(false)}>
               <Text style={[styles.modeBtnText, !manualMode && styles.modeBtnTextActive]}>🔍 Search Foods</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.modeBtn, manualMode && styles.modeBtnActive]}
-              onPress={() => setManualMode(true)}>
+            <TouchableOpacity style={[styles.modeBtn, manualMode && styles.modeBtnActive]} onPress={() => setManualMode(true)}>
               <Text style={[styles.modeBtnText, manualMode && styles.modeBtnTextActive]}>✏️ Manual Entry</Text>
             </TouchableOpacity>
           </View>
-
           {!manualMode ? (
             <>
-              <TextInput style={styles.searchInput} placeholder="Search food database..."
-                placeholderTextColor={COLORS.textMuted} value={search}
-                onChangeText={setSearch} />
+              <TextInput
+                style={styles.searchInput} placeholder="Search food database..."
+                placeholderTextColor={COLORS.textMuted} value={search} onChangeText={setSearch}
+              />
               <FlatList
-                data={filteredDB}
-                keyExtractor={i => i.id}
+                data={filteredDB} keyExtractor={(i) => i.id}
                 renderItem={({ item }) => (
                   <TouchableOpacity style={styles.dbItem} onPress={() => handleAddFromDB(item)}>
                     <View style={styles.dbItemInfo}>
@@ -265,42 +252,46 @@ export default function FoodScreen() {
           ) : (
             <ScrollView style={styles.manualScroll} keyboardShouldPersistTaps="handled">
               {[
-                { key: 'foodName', label: 'Food Name *', placeholder: 'e.g. Chicken Breast', keyboard: 'default' },
-                { key: 'calories', label: 'Calories (kcal) *', placeholder: '0', keyboard: 'numeric' },
-                { key: 'protein', label: 'Protein (g)', placeholder: '0', keyboard: 'numeric' },
-                { key: 'carbs', label: 'Carbs (g)', placeholder: '0', keyboard: 'numeric' },
-                { key: 'fats', label: 'Fats (g)', placeholder: '0', keyboard: 'numeric' },
-                { key: 'fiber', label: 'Fiber (g)', placeholder: '0', keyboard: 'numeric' },
-              ].map(field => (
+                { key: 'foodName', label: 'Food Name *',     placeholder: 'e.g. Chicken Breast', keyboard: 'default' },
+                { key: 'calories', label: 'Calories (kcal) *', placeholder: '0',                  keyboard: 'numeric' },
+                { key: 'protein',  label: 'Protein (g)',      placeholder: '0',                  keyboard: 'numeric' },
+                { key: 'carbs',    label: 'Carbs (g)',        placeholder: '0',                  keyboard: 'numeric' },
+                { key: 'fats',     label: 'Fats (g)',         placeholder: '0',                  keyboard: 'numeric' },
+                { key: 'fiber',    label: 'Fiber (g)',        placeholder: '0',                  keyboard: 'numeric' },
+              ].map((field) => (
                 <View key={field.key} style={styles.formField}>
                   <Text style={styles.formLabel}>{field.label}</Text>
-                  <TextInput style={styles.formInput} placeholder={field.placeholder}
+                  <TextInput
+                    style={styles.formInput} placeholder={field.placeholder}
                     placeholderTextColor={COLORS.textMuted}
                     keyboardType={field.keyboard as any}
                     value={form[field.key as keyof typeof form]}
-                    onChangeText={v => setForm(prev => ({ ...prev, [field.key]: v }))} />
+                    onChangeText={(v) => setForm((prev) => ({ ...prev, [field.key]: v }))}
+                  />
                 </View>
               ))}
-              {user.isPremium && (
+              {user?.isPremium && (
                 <>
                   <Text style={[styles.formLabel, { color: COLORS.yellow, marginTop: SPACING.lg }]}>💎 Micronutrients (Premium)</Text>
                   {[
-                    { key: 'calcium', label: 'Calcium (mg)' },
-                    { key: 'iron', label: 'Iron (mg)' },
+                    { key: 'calcium',   label: 'Calcium (mg)' },
+                    { key: 'iron',      label: 'Iron (mg)' },
                     { key: 'magnesium', label: 'Magnesium (mg)' },
-                  ].map(field => (
+                  ].map((field) => (
                     <View key={field.key} style={styles.formField}>
                       <Text style={styles.formLabel}>{field.label}</Text>
-                      <TextInput style={styles.formInput} placeholder="0"
+                      <TextInput
+                        style={styles.formInput} placeholder="0"
                         placeholderTextColor={COLORS.textMuted} keyboardType="numeric"
                         value={form[field.key as keyof typeof form]}
-                        onChangeText={v => setForm(prev => ({ ...prev, [field.key]: v }))} />
+                        onChangeText={(v) => setForm((prev) => ({ ...prev, [field.key]: v }))}
+                      />
                     </View>
                   ))}
                 </>
               )}
               <TouchableOpacity style={styles.saveBtn} onPress={handleManualAdd}>
-                <LinearGradient colors={[COLORS.primary, COLORS.primaryLight] as [string,string]} style={styles.saveBtnGrad}>
+                <LinearGradient colors={[COLORS.primary, COLORS.primaryLight]} style={styles.saveBtnGrad}>
                   <Text style={styles.saveBtnText}>Log Food 🍎</Text>
                 </LinearGradient>
               </TouchableOpacity>

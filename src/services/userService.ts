@@ -1,18 +1,21 @@
 // src/services/userService.ts
-import api from './api';
+// ─── MOCK implementation ──────────────────────────────────────────────────────
+import userData from '../data/user.json';
+import { AuthUser } from './authService';
+
+let mockUser = { ...userData.user } as any;
 
 export const userService = {
   async getProfile() {
-    const { data } = await api.get('/user/profile');
-    return data; // { user, leaderboard }
+    await new Promise((r) => setTimeout(r, 300));
+    return {
+      user:        mockUser as AuthUser,
+      leaderboard: userData.leaderboard,
+    };
   },
 
-  async updateProfile(updates: {
-    name?: string; age?: number; gender?: string; height?: number;
-    weight?: number; targetWeight?: number; calorieGoal?: number;
-    waterGoal?: number; activityLevel?: string; theme?: string; avatar?: string;
-  }) {
-    const { data } = await api.patch('/user/profile', updates);
-    return data.user;
+  async updateProfile(updates: Partial<AuthUser & { theme?: string }>) {
+    mockUser = { ...mockUser, ...updates };
+    return mockUser as AuthUser;
   },
 };

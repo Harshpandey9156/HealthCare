@@ -1,23 +1,36 @@
 // src/services/workoutService.ts
-import api from './api';
+// ─── MOCK implementation ──────────────────────────────────────────────────────
+import workoutData from '../data/workout.json';
+
+let mockLogs = [...workoutData.logs].map((l) => ({ ...l })) as any[];
+let nextId = mockLogs.length + 1;
 
 export const workoutService = {
-  async getLogs(date?: string) {
-    const params = date ? { date } : {};
-    const { data } = await api.get('/workout', { params });
-    return data; // { logs, allLogs, weeklyMinutes }
+  async getLogs(_date?: string) {
+    await new Promise((r) => setTimeout(r, 300));
+    return {
+      logs:         mockLogs,
+      allLogs:      mockLogs,
+      weeklyMinutes: workoutData.weeklyMinutes,
+      weeklyPlan:   workoutData.weeklyPlan,
+    };
   },
 
   async addLog(log: {
-    name: string; workoutType: string; duration: number;
-    caloriesBurned: number; intensity?: string; date?: string; notes?: string;
+    date: string; name: string; workoutType: string;
+    duration: number; caloriesBurned: number; intensity: string; emoji: string;
   }) {
-    const { data } = await api.post('/workout', log);
-    return data.log;
+    const newLog = { id: `w_new_${nextId++}`, ...log };
+    mockLogs.unshift(newLog);
+    return newLog;
   },
 
   async removeLog(id: string) {
-    const { data } = await api.delete(`/workout/${id}`);
-    return data;
+    mockLogs = mockLogs.filter((l) => l.id !== id);
+    return { success: true };
+  },
+
+  getWeeklyPlan() {
+    return workoutData.weeklyPlan;
   },
 };

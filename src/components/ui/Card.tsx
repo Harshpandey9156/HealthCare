@@ -1,11 +1,11 @@
 // src/components/ui/Card.tsx
 import React from 'react';
-import { View, ViewStyle, StyleSheet } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { COLORS, RADIUS, SHADOW } from '../../constants/theme';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;   // accepts StyleProp so arrays & conditionals work
   elevated?: boolean;
   padding?: number;
 }

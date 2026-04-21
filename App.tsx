@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StatusBar } from 'expo-status-bar';
-import { Text, View, StyleSheet, ActivityIndicator } from 'react-native';
+import { StatusBar, Text, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -36,7 +35,7 @@ function TabIcon({ emoji, label, focused, colors }: {
 
 // ─── Main Tab Navigator ───────────────────────────────────────────────────────
 function MainTabs() {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Tab.Navigator
@@ -100,7 +99,10 @@ function RootNavigator() {
 
   return (
     <>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.bg}
+      />
       <NavigationContainer>
         {isAuthenticated ? <MainTabs /> : <AuthStack />}
       </NavigationContainer>

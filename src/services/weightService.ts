@@ -1,17 +1,19 @@
 // src/services/weightService.ts
-import api from './api';
+// ─── MOCK implementation ──────────────────────────────────────────────────────
+import weightData from '../data/weight.json';
+
+let mockLogs = [...(weightData as any).logs || []].map((l: any) => ({ ...l }));
+let nextId = mockLogs.length + 1;
 
 export const weightService = {
   async getLogs() {
-    const { data } = await api.get('/weight');
-    return data.logs;
+    await new Promise((r) => setTimeout(r, 300));
+    return mockLogs;
   },
 
-  async addLog(log: { weight: number; bmi: number; date?: string; note?: string }) {
-    const { data } = await api.post('/weight', {
-      ...log,
-      date: log.date || new Date().toISOString().split('T')[0],
-    });
-    return data.log;
+  async addLog(log: { date: string; weight: number; bmi: number }) {
+    const newLog = { id: `wt_new_${nextId++}`, ...log };
+    mockLogs.unshift(newLog);
+    return newLog;
   },
 };

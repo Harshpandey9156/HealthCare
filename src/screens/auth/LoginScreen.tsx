@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 import { useAppStore } from '../../store/useAppStore';
 import { useTheme } from '../../context/ThemeContext';
 import { FONT, SPACING, RADIUS } from '../../constants/theme';

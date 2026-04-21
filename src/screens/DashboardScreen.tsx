@@ -1,11 +1,11 @@
 // src/screens/DashboardScreen.tsx
 import React, { useEffect } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  View, Text, StyleSheet, ScrollView,
   Dimensions, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 import { LineChart, PieChart } from 'react-native-chart-kit';
 import { useAppStore } from '../store/useAppStore';
 import { Card } from '../components/ui/Card';
@@ -17,10 +17,10 @@ const { width: W } = Dimensions.get('window');
 const CHART_W = W - SPACING.lg * 2 - 32;
 
 export default function DashboardScreen() {
-  const { colors, isDark, gradients } = useTheme();
+  const { colors, isDark } = useTheme();
   const {
     user, todayCalories, todayProtein, todayCarbs, todayFats,
-    foodLogs, workoutLogs, calorieTrend, waterTotal, waterGoal,
+    foodLogs, workoutLogs, calorieTrend, waterTotal,
     fetchFoodLogs, fetchWorkoutLogs, fetchWaterLogs, isLoadingFood,
   } = useAppStore();
 
@@ -30,25 +30,28 @@ export default function DashboardScreen() {
     fetchFoodLogs(today);
     fetchWorkoutLogs(today);
     fetchWaterLogs(today);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const calorieGoal = user?.calorieGoal || 2000;
-  const calPct = Math.min(Math.round((todayCalories / calorieGoal) * 100), 100);
-  const overallStreak = user?.streaks?.overall?.current || 0;
-  const todayWorkouts = workoutLogs.filter((w) => w.date === today);
+  const calorieGoal     = user?.calorieGoal || 2000;
+  const calPct          = Math.min(Math.round((todayCalories / calorieGoal) * 100), 100);
+  const overallStreak   = user?.streaks?.overall?.current || 0;
+  const todayWorkouts   = workoutLogs.filter((w) => w.date === today);
   const totalWorkoutCal = todayWorkouts.reduce((s, w) => s + w.caloriesBurned, 0);
 
   const macroTotal = todayProtein + todayCarbs + todayFats;
-  const pieData = macroTotal > 0 ? [
-    { name: 'P', population: todayProtein, color: colors.primary, legendFontColor: colors.textSecondary, legendFontSize: 12 },
-    { name: 'C', population: todayCarbs,   color: colors.orange,  legendFontColor: colors.textSecondary, legendFontSize: 12 },
-    { name: 'F', population: todayFats,    color: colors.red,     legendFontColor: colors.textSecondary, legendFontSize: 12 },
-  ] : [{ name: 'Log meals', population: 1, color: colors.border, legendFontColor: colors.textMuted, legendFontSize: 12 }];
+  const pieData = macroTotal > 0
+    ? [
+        { name: 'P', population: todayProtein, color: colors.primary, legendFontColor: colors.textSecondary, legendFontSize: 12 },
+        { name: 'C', population: todayCarbs,   color: colors.orange,  legendFontColor: colors.textSecondary, legendFontSize: 12 },
+        { name: 'F', population: todayFats,    color: colors.red,     legendFontColor: colors.textSecondary, legendFontSize: 12 },
+      ]
+    : [{ name: 'Log meals', population: 1, color: colors.border, legendFontColor: colors.textMuted, legendFontSize: 12 }];
 
   const lineData = {
     labels: calorieTrend.length > 0 ? calorieTrend.map((d: any) => d.day) : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     datasets: [{
-      data: calorieTrend.length > 0 ? calorieTrend.map((d: any) => d.calories || 0) : [0, 0, 0, 0, 0, 0, 0],
+      data: calorieTrend.length > 0 ? calorieTrend.map((d: any) => d.calories || 0) : [0,0,0,0,0,0,0],
       color: (opacity = 1) => `rgba(99,102,241,${opacity})`,
       strokeWidth: 2.5,
     }],
@@ -56,7 +59,7 @@ export default function DashboardScreen() {
 
   const chartConfig = {
     backgroundGradientFrom: colors.card,
-    backgroundGradientTo: colors.card,
+    backgroundGradientTo:   colors.card,
     decimalPlaces: 0,
     color: (opacity = 1) => `rgba(99,102,241,${opacity})`,
     labelColor: () => colors.textMuted,
@@ -71,20 +74,13 @@ export default function DashboardScreen() {
     return 'Good evening';
   };
 
-  const heroColors = isDark
-    ? (['#0F0F1F', '#1A0A2E'] as [string, string])
-    : (['#EEF2FF', '#F0F4FF'] as [string, string]);
-
-  const heroCardColors = isDark
-    ? (['#1E1B4B', '#13131F'] as [string, string])
-    : (['#FFFFFF', '#F8FAFC'] as [string, string]);
-
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-
-        {/* Hero Header */}
-        <LinearGradient colors={heroColors} style={styles.hero}>
+        <LinearGradient
+          colors={isDark ? ['#0F0F1F', '#1A0A2E'] : ['#EEF2FF', '#F0F4FF']}
+          style={styles.hero}
+        >
           <View style={styles.heroTop}>
             <View>
               <Text style={[styles.greeting, { color: colors.textSecondary }]}>{greeting()} 👋</Text>
@@ -97,10 +93,11 @@ export default function DashboardScreen() {
               </View>
             )}
           </View>
-
-          {/* Calorie Card */}
           <View style={[styles.heroCard, { borderColor: `${colors.primary}30` }]}>
-            <LinearGradient colors={heroCardColors} style={styles.heroCardInner}>
+            <LinearGradient
+              colors={isDark ? ['#1E1B4B', '#13131F'] : ['#FFFFFF', '#F8FAFC']}
+              style={styles.heroCardInner}
+            >
               <View style={styles.heroRow}>
                 <View style={styles.ringContainer}>
                   <RingProgress value={todayCalories} max={calorieGoal} color={colors.primary} size={90} bgColor={colors.border} />
@@ -111,11 +108,11 @@ export default function DashboardScreen() {
                 <View style={styles.heroStats}>
                   <Text style={[styles.heroCalLabel, { color: colors.textMuted }]}>Calories Today</Text>
                   <Text style={[styles.heroCalValue, { color: colors.textPrimary }]}>{todayCalories.toLocaleString()}</Text>
-                  <Text style={[styles.heroCalGoal, { color: colors.textMuted }]}>/ {calorieGoal.toLocaleString()} kcal</Text>
+                  <Text style={[styles.heroCalGoal,  { color: colors.textMuted }]}>/ {calorieGoal.toLocaleString()} kcal</Text>
                   <View style={styles.miniMacros}>
                     <MacroDot label="P" value={todayProtein} color={colors.primary} />
-                    <MacroDot label="C" value={todayCarbs} color={colors.orange} />
-                    <MacroDot label="F" value={todayFats} color={colors.red} />
+                    <MacroDot label="C" value={todayCarbs}   color={colors.orange} />
+                    <MacroDot label="F" value={todayFats}    color={colors.red} />
                   </View>
                 </View>
               </View>
@@ -128,51 +125,30 @@ export default function DashboardScreen() {
         </LinearGradient>
 
         <View style={styles.body}>
-          {/* Quick Stats */}
           <View style={styles.quickRow}>
-            <QuickStat icon="💧" value={`${waterTotal.toFixed(1)}L`} label="Water" color={colors.blue} colors={colors} />
-            <QuickStat icon="🔥" value={`${totalWorkoutCal}`} label="Burned" color={colors.red} colors={colors} />
-            <QuickStat icon="🏋️" value={`${todayWorkouts.length}`} label="Workouts" color={colors.purple} colors={colors} />
-            <QuickStat icon="⭐" value={`${user?.points || 0}`} label="Points" color={colors.yellow} colors={colors} />
+            <QuickStat icon="💧" value={`${waterTotal.toFixed(1)}L`} label="Water"    color={colors.blue}   colors={colors} />
+            <QuickStat icon="🔥" value={`${totalWorkoutCal}`}        label="Burned"   color={colors.red}    colors={colors} />
+            <QuickStat icon="🏋️" value={`${todayWorkouts.length}`}   label="Workouts" color={colors.purple} colors={colors} />
+            <QuickStat icon="⭐" value={`${user?.points || 0}`}      label="Points"   color={colors.yellow} colors={colors} />
           </View>
 
-          {/* Calorie Trend Chart */}
           <Card style={[styles.section, { backgroundColor: colors.card }]}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>7-Day Calorie Trend 📈</Text>
-            <Text style={[styles.sectionSub, { color: colors.textMuted }]}>Daily intake vs goal</Text>
+            <Text style={[styles.sectionSub,   { color: colors.textMuted }]}>Daily intake vs goal</Text>
             {isLoadingFood ? (
               <ActivityIndicator color={colors.primary} style={{ marginVertical: 40 }} />
             ) : (
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <LineChart
-                  data={lineData}
-                  width={CHART_W}
-                  height={180}
-                  chartConfig={chartConfig}
-                  bezier
-                  style={styles.chart}
-                  withInnerLines={false}
-                  yAxisSuffix=" cal"
-                />
+                <LineChart data={lineData} width={CHART_W} height={180} chartConfig={chartConfig} bezier style={styles.chart} withInnerLines={false} yAxisSuffix=" cal" />
               </ScrollView>
             )}
           </Card>
 
-          {/* Macro Breakdown */}
           <Card style={[styles.section, { backgroundColor: colors.card }]}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Macro Breakdown 🥗</Text>
-            <Text style={[styles.sectionSub, { color: colors.textMuted }]}>Today's nutrient distribution</Text>
+            <Text style={[styles.sectionSub,   { color: colors.textMuted }]}>Today's nutrient distribution</Text>
             <View style={styles.pieRow}>
-              <PieChart
-                data={pieData}
-                width={W / 2 - 16}
-                height={160}
-                chartConfig={chartConfig}
-                accessor="population"
-                backgroundColor="transparent"
-                paddingLeft="10"
-                hasLegend={false}
-              />
+              <PieChart data={pieData} width={W / 2 - 16} height={160} chartConfig={chartConfig} accessor="population" backgroundColor="transparent" paddingLeft="10" hasLegend={false} />
               <View style={styles.macroLegend}>
                 {[
                   { label: 'Protein', value: todayProtein, color: colors.primary },
@@ -183,7 +159,7 @@ export default function DashboardScreen() {
                     <View style={[styles.macroLegendDot, { backgroundColor: m.color }]} />
                     <View>
                       <Text style={[styles.macroLegendLabel, { color: colors.textMuted }]}>{m.label}</Text>
-                      <Text style={[styles.macroLegendVal, { color: m.color }]}>{Math.round(m.value)}g</Text>
+                      <Text style={[styles.macroLegendVal,   { color: m.color }]}>{Math.round(m.value)}g</Text>
                     </View>
                   </View>
                 ))}
@@ -191,7 +167,6 @@ export default function DashboardScreen() {
             </View>
           </Card>
 
-          {/* Today's Meals */}
           <Card style={[styles.section, { backgroundColor: colors.card }]}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Today's Meals 🍽️</Text>
             {foodLogs.length > 0 ? foodLogs.slice(0, 4).map((meal) => (
@@ -201,7 +176,6 @@ export default function DashboardScreen() {
             )}
           </Card>
 
-          {/* Today's Workouts */}
           <Card style={[styles.section, { backgroundColor: colors.card }]}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Today's Workouts 🏋️</Text>
             {todayWorkouts.length > 0 ? todayWorkouts.map((w) => (
@@ -221,16 +195,7 @@ function RingProgress({ value, max, color, size, bgColor }: { value: number; max
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ width: size, height: size, borderRadius: size / 2, borderWidth: 7, borderColor: bgColor, position: 'absolute' }} />
-      <View style={{
-        width: size - 14, height: size - 14, borderRadius: (size - 14) / 2,
-        borderWidth: 7, borderColor: 'transparent',
-        borderTopColor: color,
-        borderRightColor: pct > 0.25 ? color : 'transparent',
-        borderBottomColor: pct > 0.5 ? color : 'transparent',
-        borderLeftColor: pct > 0.75 ? color : 'transparent',
-        transform: [{ rotate: '-45deg' }],
-        position: 'absolute',
-      }} />
+      <View style={{ width: size - 14, height: size - 14, borderRadius: (size - 14) / 2, borderWidth: 7, borderColor: 'transparent', borderTopColor: color, borderRightColor: pct > 0.25 ? color : 'transparent', borderBottomColor: pct > 0.5 ? color : 'transparent', borderLeftColor: pct > 0.75 ? color : 'transparent', transform: [{ rotate: '-45deg' }], position: 'absolute' }} />
     </View>
   );
 }
@@ -247,7 +212,7 @@ function MacroDot({ label, value, color }: { label: string; value: number; color
 function QuickStat({ icon, value, label, color, colors }: { icon: string; value: string; label: string; color: string; colors: any }) {
   return (
     <View style={[styles.quickStat, { borderColor: `${color}30`, backgroundColor: colors.card }]}>
-      <LinearGradient colors={[`${color}20`, `${color}05`] as [string, string]} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={[`${color}20`, `${color}05`]} style={StyleSheet.absoluteFill} />
       <Text style={styles.quickIcon}>{icon}</Text>
       <Text style={[styles.quickValue, { color }]}>{value}</Text>
       <Text style={[styles.quickLabel, { color: colors.textMuted }]}>{label}</Text>
@@ -256,16 +221,14 @@ function QuickStat({ icon, value, label, color, colors }: { icon: string; value:
 }
 
 function MealRow({ meal, colors }: { meal: any; colors: any }) {
-  const mealColors: Record<string, string> = {
-    breakfast: colors.orange, lunch: colors.green, snack: colors.primary, dinner: colors.red,
-  };
+  const mealColors: Record<string, string> = { breakfast: colors.orange, lunch: colors.green, snack: colors.primary, dinner: colors.red };
   const color = mealColors[meal.mealType] || colors.primary;
   return (
     <View style={[styles.mealRow, { borderBottomColor: colors.borderSubtle }]}>
       <View style={[styles.mealDot, { backgroundColor: color }]} />
       <View style={styles.mealInfo}>
         <Text style={[styles.mealName, { color: colors.textPrimary }]}>{meal.foodName}</Text>
-        <Text style={[styles.mealSub, { color: colors.textMuted }]}>{meal.mealType} · P:{Math.round(meal.protein)}g C:{Math.round(meal.carbs)}g F:{Math.round(meal.fats)}g</Text>
+        <Text style={[styles.mealSub,  { color: colors.textMuted }]}>{meal.mealType} · P:{Math.round(meal.protein)}g C:{Math.round(meal.carbs)}g F:{Math.round(meal.fats)}g</Text>
       </View>
       <Text style={[styles.mealCal, { color }]}>{Math.round(meal.calories)}</Text>
     </View>
@@ -278,7 +241,7 @@ function WorkoutRow({ workout, colors }: { workout: any; colors: any }) {
       <Text style={styles.workoutEmoji}>{workout.emoji}</Text>
       <View style={styles.workoutInfo}>
         <Text style={[styles.workoutName, { color: colors.textPrimary }]}>{workout.name}</Text>
-        <Text style={[styles.workoutSub, { color: colors.textMuted }]}>{workout.duration} min</Text>
+        <Text style={[styles.workoutSub,  { color: colors.textMuted }]}>{workout.duration} min</Text>
       </View>
       <Text style={[styles.workoutCal, { color: colors.green }]}>-{workout.caloriesBurned} kcal</Text>
     </View>

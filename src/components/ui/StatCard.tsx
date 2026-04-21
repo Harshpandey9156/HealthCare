@@ -1,7 +1,7 @@
 // src/components/ui/StatCard.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 import { COLORS, RADIUS, FONT, SPACING } from '../../constants/theme';
 import { ProgressBar } from './ProgressBar';
 

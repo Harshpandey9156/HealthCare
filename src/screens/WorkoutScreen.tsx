@@ -5,21 +5,20 @@ import {
   Modal, TextInput, Alert, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 import { BarChart } from 'react-native-chart-kit';
-import { useAppStore, WorkoutLog } from '../store/useAppStore';
+import { useAppStore } from '../store/useAppStore';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { COLORS, FONT, SPACING, RADIUS, WORKOUT_CONFIG } from '../constants/theme';
 
 const { width: W } = Dimensions.get('window');
-
 const WORKOUT_TYPES = ['strength', 'cardio', 'yoga', 'hiit', 'cycling', 'swimming', 'walking'];
 const INTENSITIES = ['low', 'medium', 'high'];
 
 const chartConfig = {
   backgroundGradientFrom: COLORS.card,
-  backgroundGradientTo: COLORS.card,
+  backgroundGradientTo:   COLORS.card,
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(99,102,241,${opacity})`,
   labelColor: () => COLORS.textMuted,
@@ -40,58 +39,54 @@ export default function WorkoutScreen() {
   const autoCalc = () => {
     const dur = parseFloat(form.duration) || 30;
     const met: Record<string, number> = { running: 9.8, cycling: 7.5, swimming: 8, strength: 5, yoga: 3, hiit: 10, walking: 3.8, cardio: 7 };
-    const m = met[selectedType] || 5;
-    const cal = Math.round((m * 70 * dur) / 60);
-    setForm(p => ({ ...p, caloriesBurned: String(cal) }));
+    const cal = Math.round(((met[selectedType] || 5) * 70 * dur) / 60);
+    setForm((p) => ({ ...p, caloriesBurned: String(cal) }));
   };
 
   const handleAdd = () => {
     if (!form.name || !form.duration) { Alert.alert('Missing info', 'Name and duration required'); return; }
     const cfg = WORKOUT_CONFIG[selectedType];
     addWorkoutLog({
-      date: new Date().toISOString().split('T')[0],
-      name: form.name,
-      workoutType: selectedType,
-      duration: parseFloat(form.duration) || 0,
+      date:           new Date().toISOString().split('T')[0],
+      name:           form.name,
+      workoutType:    selectedType,
+      duration:       parseFloat(form.duration) || 0,
       caloriesBurned: parseFloat(form.caloriesBurned) || 0,
-      intensity: selectedIntensity,
-      emoji: cfg.emoji,
+      intensity:      selectedIntensity,
+      emoji:          cfg.emoji,
     });
     setForm({ name: '', duration: '', caloriesBurned: '' });
     setShowModal(false);
   };
 
   const barData = {
-    labels: weeklyMinutes.map(d => d.day),
-    datasets: [{ data: weeklyMinutes.map(d => d.minutes) }],
+    labels:   (weeklyMinutes || []).map((d) => d.day),
+    datasets: [{ data: (weeklyMinutes || []).map((d) => d.minutes) }],
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Workouts 🏋️</Text>
             <Text style={styles.subtitle}>Track your training sessions</Text>
           </View>
           <TouchableOpacity style={styles.addBtn} onPress={() => setShowModal(true)}>
-            <LinearGradient colors={[COLORS.primary, COLORS.primaryLight] as [string,string]} style={styles.addBtnGrad}>
+            <LinearGradient colors={[COLORS.primary, COLORS.primaryLight]} style={styles.addBtnGrad}>
               <Text style={styles.addBtnText}>+ Log</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Stats */}
         <View style={styles.statsRow}>
           {[
-            { label: 'Total Min', value: totalMin, unit: 'min', color: COLORS.primary, emoji: '⏱️' },
-            { label: 'Calories', value: Math.round(totalCal), unit: 'kcal', color: COLORS.red, emoji: '🔥' },
-            { label: 'Sessions', value: workoutLogs.length, unit: '', color: COLORS.green, emoji: '⚡' },
-          ].map(s => (
+            { label: 'Total Min', value: totalMin,               unit: 'min',  color: COLORS.primary, emoji: '⏱️' },
+            { label: 'Calories',  value: Math.round(totalCal),   unit: 'kcal', color: COLORS.red,     emoji: '🔥' },
+            { label: 'Sessions',  value: workoutLogs.length,     unit: '',     color: COLORS.green,   emoji: '⚡' },
+          ].map((s) => (
             <View key={s.label} style={[styles.statBox, { borderColor: `${s.color}30` }]}>
-              <LinearGradient colors={[`${s.color}15`, `${s.color}05`] as [string,string]} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={[`${s.color}15`, `${s.color}05`]} style={StyleSheet.absoluteFill} />
               <Text style={styles.statEmoji}>{s.emoji}</Text>
               <Text style={[styles.statValue, { color: s.color }]}>{s.value}</Text>
               <Text style={styles.statUnit}>{s.unit}</Text>
@@ -100,10 +95,9 @@ export default function WorkoutScreen() {
           ))}
         </View>
 
-        {/* Tabs */}
         <View style={styles.tabs}>
-          <TouchableOpacity style={[styles.tab, activeTab === 'log' && styles.tabActive]} onPress={() => setActiveTab('log')}>
-            <Text style={[styles.tabText, activeTab === 'log' && styles.tabTextActive]}>📋 Activity Log</Text>
+          <TouchableOpacity style={[styles.tab, activeTab === 'log'  && styles.tabActive]} onPress={() => setActiveTab('log')}>
+            <Text style={[styles.tabText, activeTab === 'log'  && styles.tabTextActive]}>📋 Activity Log</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.tab, activeTab === 'plan' && styles.tabActive]} onPress={() => setActiveTab('plan')}>
             <Text style={[styles.tabText, activeTab === 'plan' && styles.tabTextActive]}>📅 Weekly Plan</Text>
@@ -112,26 +106,25 @@ export default function WorkoutScreen() {
 
         {activeTab === 'log' ? (
           <>
-            {/* Weekly Activity Chart */}
             <Card style={styles.chartCard}>
               <Text style={styles.sectionTitle}>Weekly Activity</Text>
-              <BarChart
-                data={barData}
-                width={W - SPACING.lg * 2 - 32}
-                height={160}
-                chartConfig={chartConfig}
-                style={styles.chart}
-                showValuesOnTopOfBars
-                fromZero
-                yAxisLabel=""
-                yAxisSuffix="m"
-              />
+              {weeklyMinutes && weeklyMinutes.length > 0 && (
+                <BarChart
+                  data={barData}
+                  width={W - SPACING.lg * 2 - 32}
+                  height={160}
+                  chartConfig={chartConfig}
+                  style={styles.chart}
+                  showValuesOnTopOfBars
+                  fromZero
+                  yAxisLabel=""
+                  yAxisSuffix="m"
+                />
+              )}
             </Card>
-
-            {/* Workout Logs */}
             <Card style={styles.logsCard}>
               <Text style={styles.sectionTitle}>Recent Workouts</Text>
-              {workoutLogs.length > 0 ? workoutLogs.map(log => {
+              {workoutLogs.length > 0 ? workoutLogs.map((log) => {
                 const cfg = WORKOUT_CONFIG[log.workoutType] || WORKOUT_CONFIG.strength;
                 const intensityColors: Record<string, string> = { low: COLORS.green, medium: COLORS.orange, high: COLORS.red };
                 return (
@@ -163,23 +156,22 @@ export default function WorkoutScreen() {
         ) : (
           <Card style={styles.planCard}>
             <Text style={styles.sectionTitle}>Weekly Training Plan</Text>
-            {weeklyPlan.map(day => {
+            {(weeklyPlan || []).map((day) => {
               const isToday = todayDay === day.day;
               const cfg = WORKOUT_CONFIG[day.type] || WORKOUT_CONFIG.rest;
               return (
                 <View key={day.day} style={[styles.planRow, isToday && { borderColor: COLORS.primary, borderWidth: 1 }]}>
                   <LinearGradient
-                    colors={isToday ? [COLORS.primarySubtle, 'transparent'] as [string,string] : ['transparent', 'transparent'] as [string,string]}
-                    style={StyleSheet.absoluteFill} />
+                    colors={isToday ? [COLORS.primarySubtle, 'transparent'] : ['transparent', 'transparent']}
+                    style={StyleSheet.absoluteFill}
+                  />
                   <Text style={[styles.planDay, isToday && { color: COLORS.primary }]}>
                     {day.day.slice(0, 3)}{isToday ? ' (Today)' : ''}
                   </Text>
                   <Text style={styles.planEmoji}>{day.emoji}</Text>
                   <View style={styles.planInfo}>
                     <Text style={styles.planWorkout}>{day.workout}</Text>
-                    {day.duration > 0 && (
-                      <Text style={styles.planDuration}>{day.duration} min · {cfg.label}</Text>
-                    )}
+                    {day.duration > 0 && <Text style={styles.planDuration}>{day.duration} min · {cfg.label}</Text>}
                   </View>
                   {day.planned ? (
                     <Badge label="Planned" color={COLORS.green} size="sm" />
@@ -191,10 +183,8 @@ export default function WorkoutScreen() {
             })}
           </Card>
         )}
-
       </ScrollView>
 
-      {/* Log Workout Modal */}
       <Modal visible={showModal} animationType="slide" presentationStyle="pageSheet">
         <View style={styles.modal}>
           <View style={styles.modalHeader}>
@@ -204,11 +194,9 @@ export default function WorkoutScreen() {
             </TouchableOpacity>
           </View>
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.modalScroll}>
-
-            {/* Workout Type */}
             <Text style={styles.formLabel}>Workout Type</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.typeScroll}>
-              {WORKOUT_TYPES.map(type => {
+              {WORKOUT_TYPES.map((type) => {
                 const cfg = WORKOUT_CONFIG[type];
                 const active = selectedType === type;
                 return (
@@ -221,36 +209,25 @@ export default function WorkoutScreen() {
               })}
             </ScrollView>
 
-            {/* Name */}
             <Text style={styles.formLabel}>Workout Name *</Text>
-            <TextInput style={styles.formInput} placeholder="e.g. Morning Run"
-              placeholderTextColor={COLORS.textMuted} value={form.name}
-              onChangeText={v => setForm(p => ({ ...p, name: v }))} />
+            <TextInput style={styles.formInput} placeholder="e.g. Morning Run" placeholderTextColor={COLORS.textMuted} value={form.name} onChangeText={(v) => setForm((p) => ({ ...p, name: v }))} />
 
-            {/* Duration */}
             <Text style={styles.formLabel}>Duration (minutes) *</Text>
-            <TextInput style={styles.formInput} placeholder="30" keyboardType="numeric"
-              placeholderTextColor={COLORS.textMuted} value={form.duration}
-              onChangeText={v => setForm(p => ({ ...p, duration: v }))}
-              onBlur={autoCalc} />
+            <TextInput style={styles.formInput} placeholder="30" keyboardType="numeric" placeholderTextColor={COLORS.textMuted} value={form.duration} onChangeText={(v) => setForm((p) => ({ ...p, duration: v }))} onBlur={autoCalc} />
 
-            {/* Calories */}
             <View style={styles.calRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.formLabel}>Calories Burned</Text>
-                <TextInput style={styles.formInput} placeholder="0" keyboardType="numeric"
-                  placeholderTextColor={COLORS.textMuted} value={form.caloriesBurned}
-                  onChangeText={v => setForm(p => ({ ...p, caloriesBurned: v }))} />
+                <TextInput style={styles.formInput} placeholder="0" keyboardType="numeric" placeholderTextColor={COLORS.textMuted} value={form.caloriesBurned} onChangeText={(v) => setForm((p) => ({ ...p, caloriesBurned: v }))} />
               </View>
               <TouchableOpacity onPress={autoCalc} style={styles.autoBtn}>
                 <Text style={styles.autoBtnText}>⚡ Auto</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Intensity */}
             <Text style={styles.formLabel}>Intensity</Text>
             <View style={styles.intensityRow}>
-              {INTENSITIES.map(i => {
+              {INTENSITIES.map((i) => {
                 const c = { low: COLORS.green, medium: COLORS.orange, high: COLORS.red }[i];
                 return (
                   <TouchableOpacity key={i} onPress={() => setSelectedIntensity(i)}
@@ -264,7 +241,7 @@ export default function WorkoutScreen() {
             </View>
 
             <TouchableOpacity style={styles.saveBtn} onPress={handleAdd}>
-              <LinearGradient colors={[COLORS.primary, COLORS.primaryLight] as [string,string]} style={styles.saveBtnGrad}>
+              <LinearGradient colors={[COLORS.primary, COLORS.primaryLight]} style={styles.saveBtnGrad}>
                 <Text style={styles.saveBtnText}>Log Workout 💪</Text>
               </LinearGradient>
             </TouchableOpacity>

@@ -1,18 +1,30 @@
 // src/services/waterService.ts
-import api from './api';
+// ─── MOCK implementation ──────────────────────────────────────────────────────
+import waterData from '../data/water.json';
+
+let mockLogs = [...waterData.logs].map((l) => ({ ...l })) as any[];
+let mockTotal = waterData.total;
+let nextId = mockLogs.length + 1;
 
 export const waterService = {
-  async getLogs(date?: string) {
-    const params = date ? { date } : {};
-    const { data } = await api.get('/water', { params });
-    return data; // { logs, total, goal, weeklyTrend }
+  async getLogs(_date?: string) {
+    await new Promise((r) => setTimeout(r, 300));
+    return {
+      logs:        mockLogs,
+      total:       mockTotal,
+      goal:        waterData.goal,
+      weeklyTrend: waterData.weeklyTrend,
+    };
   },
 
-  async addLog(amount: number, date?: string) {
-    const { data } = await api.post('/water', {
+  async addLog(amount: number) {
+    const newLog = {
+      id:     `water_new_${nextId++}`,
       amount,
-      date: date || new Date().toISOString().split('T')[0],
-    });
-    return data.log;
+      time:   new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    };
+    mockLogs.push(newLog);
+    mockTotal = parseFloat((mockTotal + amount).toFixed(2));
+    return newLog;
   },
 };
